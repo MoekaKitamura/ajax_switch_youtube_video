@@ -1,28 +1,35 @@
-function getData() {
-  const button = document.getElementById("btn");
-  const titleArea = document.getElementById("title");
-  const contentArea = document.getElementById("content");
-  const videoArea = document.getElementById("video");
+const button = document.getElementById("btn");
+const titleArea = document.getElementById("title");
+const contentArea = document.getElementById("content");
+const videoArea = document.getElementById("video");
 
-  let index = 0
-  button.onclick = function() {
-    const request = new XMLHttpRequest();
-    request.onreadystatechange = function() {
-      if (request.readyState == 4) {
-        if(request.status == 200) {
-          titleArea.innerHTML = request.response[index].title;
-          contentArea.innerHTML = request.response[index].content;
-          videoArea.setAttribute("src", request.response[index].url);
-          index++;
-          if (index == request.response.length) index = 0 
-        }
+let index = 0
+let data = [];
+
+function getData() {
+  const request = new XMLHttpRequest();
+  request.open("GET", "ajax.json");
+  request.responseType = "json";
+  request.send(null);
+  request.onreadystatechange = function() {
+    if (request.readyState == 4) {
+      if(request.status == 200) {
+        data = request.response;
       }
-    };
-    request.open("GET", "ajax.json");
-    request.responseType = "json";
-    request.send(null);
-  };
+    }
+  }
 };
 
-window.onload = getData;
+function changeVideo() {
+  if (!data.length) getData();
+  button.onclick = function() {
+    titleArea.innerHTML = data[index].title;
+    contentArea.innerHTML = data[index].content;
+    videoArea.setAttribute("src", data[index].url);
+    index++;
+    if (index == data.length) index = 0 
+  };
+}
+
+window.onload = changeVideo;
 
